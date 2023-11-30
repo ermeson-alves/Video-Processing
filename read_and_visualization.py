@@ -13,11 +13,18 @@ while ret:
 
     ret, frame = video.read() 
     if ret == True: 
-    # Display the resulting frame 
+        # Pre-processing
+        # r, g, b = frame[:, :, 0], frame[:, :, 1], frame[:, :, 2]
+        # plt.hist(r.ravel(), 256, [0, 256])
+        # plt.show()
+
+        # Display the resulting frame 
         cv2.imshow('Frame', frame) 
           
-    # Press Q on keyboard to exit 
+        # Press Q on keyboard to exit 
         if cv2.waitKey(15) & 0xFF == ord('q'): 
             break
 
 
+video.release()
+cv2.destroyAllWindows()
