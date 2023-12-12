@@ -45,7 +45,7 @@ video = cv2.VideoCapture(video_path)
 # # plt.imshow(frame_2 - frame_1)
 # plt.show()
 
-
+delta_s = 0
 cor_pixel = 255
 
 cont = 0
@@ -70,6 +70,13 @@ while True:
 	cor_linha = 255
 	espessura = 2
 	cv2.line(h, ponto_inicial, ponto_final, cor_linha, espessura)
+
+	# if cont % 5 == 0: # se passaram 5 frames
+	delta_s = coord_y - delta_s # calcula deslocamento
+	if delta_s == 0:
+		pass
+	else:
+		print(delta_s)
 
 	cv2.imshow("Video", h)
 
