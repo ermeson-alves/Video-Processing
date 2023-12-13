@@ -44,10 +44,7 @@ def view_colors_channels(video):
 	# Liberar janelas
 	video.release()
 	cv2.destroyAllWindows()
-
-
-view_colors_channels(video)
-		
+	
 
 # ret, h = cv2.threshold(h, 160, 255, cv2.THRESH_BINARY)
 # ret, h2 = cv2.threshold(h2, 160, 255, cv2.THRESH_BINARY)
@@ -72,6 +69,8 @@ view_colors_channels(video)
 # cont = 0
 
 def calc_velocity(video):
+	cont = 0
+	
 	while True:
 		# calcular a distancia q o navio se moveu a cada k frames
 		ret, frame = video.read()
@@ -123,3 +122,5 @@ def calc_velocity(video):
 	cv2.destroyAllWindows()
 
 
+# view_colors_channels(video)
+calc_velocity(video)
