@@ -7,7 +7,7 @@ import requests
 import json
 
 # path do video
-video_path = 'videos\part3(Luis Carlos).mp4'
+video_path = 'part3.mp4'
 video = cv2.VideoCapture(video_path)
 # informações do video:
 fps = int(video.get(cv2.CAP_PROP_FPS))
@@ -104,7 +104,12 @@ def calc_velocity_video(video:cv2.VideoCapture, scale:float = 0.32, period:int =
 		pixels_non_zero = cv2.findNonZero(dil_th)
 		coord_y = np.max(pixels_non_zero, axis=0)[0,1]
 		coord_y = int(coord_y)
-
+		distancia = (520-coord_y)*scale
+		# deslocamento inicial
+		if cont == 0:
+			coord_y_i = np.max(pixels_non_zero, axis=0)[0,1]
+			coord_y_old = coord_y_i
+	
 		# configurações da linha
 		ponto_inicial = (0, coord_y) 
 		ponto_final = (h.shape[1], coord_y)
@@ -112,19 +117,17 @@ def calc_velocity_video(video:cv2.VideoCapture, scale:float = 0.32, period:int =
 		espessura = 1
 		cv2.line(h_th_otsu, ponto_inicial, ponto_final, cor_linha, espessura)
 
-		# deslocamento inicial
-		if cont == 0:
-			coord_y_i = coord_y
 		# caso tenha passado uma quantidade de frames equivalentes a 15s de video:
 		if cont % (fps*period) == 0:
-			ds = (coord_y - coord_y_i) - ds
-			speed = (ds*0.32)/period
+			ds = (coord_y - coord_y_old)
+			coord_y_old = coord_y
+
+			speed = ((ds*scale)/period) * 100
 			
-			print(f"{(cont/(fps*period))*period}s de video | Velocidade: {speed:4f}m/s")
+			print(f"{(cont/(fps*period))*period}s de video | Velocidade: {speed:4f}cm/s | Deslocamento total: {coord_y - coord_y_i} | Deslocamento dos ultimos {period}s: {ds}  | Coor_y: {coord_y} | Coord_y_i: {coord_y_i}")
 
 			 # Enviar dados para o servidor Flask
-			print(type(coord_y), type(speed))
-			data = {'present-position': coord_y, 'speed': speed}
+			data = {'present_position': distancia, 'speed': speed}
 			headers = {'Content-Type': 'application/json'}
 			try:
 				response = requests.post(flask_url, data=json.dumps(data), headers=headers)

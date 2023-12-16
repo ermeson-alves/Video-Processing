@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import requests
+import json
 
 def trackShip(img, column):
 
@@ -46,8 +48,11 @@ def trackShip(img, column):
     return counter
 
 
+# URL do servidor Flask
+flask_url = 'http://127.0.0.1:8000/dados'
+
 # path do video
-video_path = 'videos/part3.mp4'
+video_path = 'part3.mp4'
 cap = cv2.VideoCapture(video_path)
 
 # kernel para realcar a imagem, deixando a diferenca de pixels mais acentuada
@@ -99,13 +104,23 @@ while ret:
             frame_array.append(position)
         else:
             # velocidade do navio (metros por segundo)
-            speed = abs(np.mean(frame_array[:119])-np.mean(frame_array[120:]))/5
+            speed = (abs(np.mean(frame_array[:119])-np.mean(frame_array[120:]))/5)*100
             # posicao do navio (distancia em metros do pier ao navio)
             present_position = np.mean(frame_array[120:])
             print(present_position)
             print(speed)
             frame_array.pop(0)
             frame_array.append(position)
+
+            # Enviar dados para o servidor Flask
+            data = {'present_position': present_position, 'speed': speed}
+            headers = {'Content-Type': 'application/json'}  # Definir o cabeçalho adequado
+            try:
+                response = requests.post(flask_url, data=json.dumps(data), headers=headers)
+                response.raise_for_status()
+                print('Dados enviados com sucesso!')
+            except requests.exceptions.RequestException as e:
+                print(f'Erro ao enviar dados para o servidor Flask: {e}')
 
         # insere na imagem do video uma linha horizontal vermelha indicando como esta sendo feito o tracking
         frame[(round(location) - 1):(round(location) + 1), (680-180):(680+180)] = [0, 0, 255]
