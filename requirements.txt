@@ -1,5 +1,4 @@
-ipykernel==6.26.0
 matplotlib==3.8.2
 opencv-python==4.8.1.78
-pipdeptree==2.13.1
 numpy==1.26.2
+requests==2.31.0
